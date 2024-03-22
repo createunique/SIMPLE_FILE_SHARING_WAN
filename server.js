@@ -5,10 +5,8 @@ const app = express();
 const server = require("http").createServer(app);
 
 const io = require("socket.io")(server);
-// app.use(express.static(path.join(__dirname)));
 
-// app.use(express.static(path.join(__dirname+"/public")));
-app.use(express.static(path.join(__dirname, "public"), { index: "main.html" }));
+app.use(express.static(path.join(__dirname,"public")));
 
 io.on("connection", function(socket) {
     socket.on("sender-join", function(data) {
@@ -34,4 +32,6 @@ io.on("connection", function(socket) {
 });
 
 
-server.listen(5000);
+server.listen(process.env.PORT || 3000, () => {
+  console.log("Server started on port 3000");
+});
