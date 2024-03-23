@@ -4,17 +4,13 @@
     {
       "src": "server.js",
       "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    { "handle": "filesystem" },
-    {
-      "src": "/socket.io",
-      "dest": "node_modules/socket.io-client/dist"
     },
     {
       "src": "/(.*)",
-      "dest": "/"
+      "use": "@vercel/static"
     }
+  ],
+  "routes": [
+    { "src": "/socket.io", "dest": "node_modules/socket.io-client/dist" }
   ]
 }
