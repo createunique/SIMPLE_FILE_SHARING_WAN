@@ -33,11 +33,15 @@ io.on('connection', function(socket) {
   });
 });
 
-// Catch-all route handler
-app.get('*', (req, res) => {
-  res.status(404).send('Page not found');
-});
+module.exports = (req, res) => {
+  return server.emit('request', req, res);
+};
 
-server.listen(process.env.PORT || 3000, () => {
-    console.log("Server started on port 3000");
-  });
+// Catch-all route handler
+// app.get('*', (req, res) => {
+//   res.status(404).send('Page not found');
+// });
+
+// server.listen(process.env.PORT || 3000, () => {
+//     console.log("Server started on port 3000");
+//   });
