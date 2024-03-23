@@ -12,11 +12,6 @@
       "dest": "/"
     }
   ],
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs14.x"
-    }
-  },
   "env": {
     "PORT": 3000
   },
@@ -25,4 +20,3 @@
     "socket.io": "^4.7.5"
   }
 }
-
