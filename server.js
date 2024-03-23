@@ -1,8 +1,8 @@
-const socketIO = require('socket.io');
 
 const express = require('express');
 const { Server } = require('http');
 const path = require('path');
+const socketIO = require('socket.io');
 
 const app = express();
 const server = new Server(app);
