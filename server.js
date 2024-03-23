@@ -8,7 +8,7 @@ const app = express();
 const server = new Server(app);
 const io = socketIO(server);
 
-app.use(express.static(path.join(__dirname, '/')));
+app.use(express.static(path.join(__dirname, "public)));
 
 io.on('connection', function(socket) {
   socket.on('sender-join', function(data) {
