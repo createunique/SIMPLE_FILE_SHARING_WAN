@@ -1,9 +1,13 @@
 {
+  "functions": { "api/**/*.js": { "runtime": "nodejs14.x" } },
   "rewrites": [{ "source": "/(.*)", "destination": "/server.js" }],
   "routes": [{ "src": "/socket.io.js", "dest": "https://cdn.socket.io/socket.io-4.0.1.min.js" }],
   "env": { "PORT": 3000 },
-  "dependencies": {
-    "express": "^4.17.1",
-    "socket.io": "^4.0.1"
+  "build": {
+    "dependencies": {
+      "express": "^4.17.1",
+      "socket.io": "^4.0.1"
+    }
   }
 }
+
