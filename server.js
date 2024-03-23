@@ -42,6 +42,6 @@ io.on('connection', function(socket) {
 //   res.status(404).send('Page not found');
 // });
 
-server.listen(process.env.PORT || 3000, () => {
+server.listen(3000, () => {
     console.log("Server started on port 3000");
   });
