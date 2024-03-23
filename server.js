@@ -1,15 +1,13 @@
 const express = require('express');
 const { Server } = require('http');
 const socketIO = require('socket.io');
+const path = require('path');
 
 const app = express();
 const server = new Server(app);
 const io = socketIO(server);
 
-app.get('*', (req, res) => {
-    res.status(404).send('Page not found');
-  });
-  
+app.use(express.static(path.join(__dirname, '/')));
 
 io.on('connection', function(socket) {
   socket.on('sender-join', function(data) {
@@ -32,6 +30,11 @@ io.on('connection', function(socket) {
   socket.on('file-raw', function(data) {
     io.to(data.uid).emit('fs-share', data.buffer);
   });
+});
+
+// Catch-all route handler
+app.get('*', (req, res) => {
+  res.status(404).send('Page not found');
 });
 
 module.exports = (req, res) => {
