@@ -1,13 +1,28 @@
 {
-  "functions": { "api/**/*.js": { "runtime": "nodejs14.x" } },
-  "rewrites": [{ "source": "/(.*)", "destination": "/server.js" }],
-  "routes": [{ "src": "/socket.io.js", "dest": "https://cdn.socket.io/socket.io-4.0.1.min.js" }],
-  "env": { "PORT": 3000 },
-  "build": {
-    "dependencies": {
-      "express": "^4.17.1",
-      "socket.io": "^4.0.1"
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
     }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
+  ],
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs14.x"
+    }
+  },
+  "env": {
+    "PORT": 3000
+  },
+  "dependencies": {
+    "express": "^4.19.1",
+    "socket.io": "^4.7.5"
   }
 }
 
