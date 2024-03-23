@@ -1,12 +1,12 @@
 {
   "name": "your-project-name",
   "version": "1.0.0",
-  "description": "Your project description",
-  "main": "server.js", // assuming your main server file is named server.js
+  "description": "roject description",
+  "main": "server.js", 
   "scripts": {
-    "start": "node server.js" // assuming your start command for the server is 'node server.js'
+    "start": "node server.js" 
   },
   "dependencies": {
-    "ws": "^8.5.0" // websocket library version
+    "ws": "^8.5.0"
   }
 }
