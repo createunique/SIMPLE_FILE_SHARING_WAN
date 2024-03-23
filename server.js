@@ -1,37 +1,39 @@
-const express = require("express");
-const path = require("path");
+const express = require('express');
+const { Server } = require('http');
+const socketIO = require('socket.io');
 
 const app = express();
-const server = require("http").createServer(app);
+const server = new Server(app);
+const io = socketIO(server);
 
-const io = require("socket.io")(server);
+app.get('*', (req, res) => {
+    res.status(404).send('Page not found');
+  });
+  
 
-app.use(express.static(path.join(__dirname, "/")));
+io.on('connection', function(socket) {
+  socket.on('sender-join', function(data) {
+    socket.join(data.uid);
+  });
 
-io.on("connection", function(socket) {
-    socket.on("sender-join", function(data) {
-        socket.join(data.uid);
-    });
+  socket.on('receiver-join', function(data) {
+    socket.join(data.uid);
+    io.to(data.sender_uid).emit('init', data.uid);
+  });
 
-    socket.on("receiver-join", function(data) {
-        socket.join(data.uid);
-        socket.in(data.sender_uid).emit("init", data.uid);
-    });
+  socket.on('file-meta', function(data) {
+    io.to(data.uid).emit('fs-meta', data.metadata);
+  });
 
-    socket.on("file-meta", function(data) {
-        socket.in(data.uid).emit("fs-meta", data.metadata);
-    });
+  socket.on('fs-start', function(data) {
+    io.to(data.uid).emit('fs-share', {});
+  });
 
-    socket.on("fs-start", function(data) {
-        socket.in(data.uid).emit("fs-share", {});
-    });
-
-    socket.on("file-raw", function(data) {
-        socket.in(data.uid).emit("fs-share", data.buffer);
-    });
+  socket.on('file-raw', function(data) {
+    io.to(data.uid).emit('fs-share', data.buffer);
+  });
 });
 
-
-server.listen(process.env.PORT || 3000, () => {
-  console.log("Server started on port 3000");
-});
+module.exports = (req, res) => {
+  return server.emit('request', req, res);
+};
