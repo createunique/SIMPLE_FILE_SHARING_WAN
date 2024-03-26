@@ -1,12 +1,8 @@
 {
-  "name": "your-project-name",
-  "version": "1.0.0",
-  "description": "roject description",
-  "main": "server.js", 
-  "scripts": {
-    "start": "node server.js" 
-  },
   "dependencies": {
-    "ws": "^8.5.0"
+    "cors": "^2.8.5",
+    "express": "^4.19.1",
+    "socket.io": "^4.7.5",
+    "ws": "^8.16.0"
   }
 }
