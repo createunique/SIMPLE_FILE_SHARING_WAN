@@ -147,25 +147,48 @@
 
 
       
-      remoteConnectBtn.addEventListener("click", async function () {
-    localPeer.setRemoteDescription(JSON.parse(remoteConfigText.value));
+//       remoteConnectBtn.addEventListener("click", async function () {
+//     localPeer.setRemoteDescription(JSON.parse(remoteConfigText.value));
     
-    // Create the answer
-    const answer = await localPeer.createAnswer();
-    await localPeer.setLocalDescription(answer);
+//     // Create the answer
+//     const answer = await localPeer.createAnswer();
+//     await localPeer.setLocalDescription(answer);
 
-    // Wait for ICE candidate to be available
-    await new Promise(resolve => {
-        localPeer.onicecandidate = (event) => {
-            if (event.candidate === null) {
-                resolve();
-            }
-        };
-    });
+//     // Wait for ICE candidate to be available
+//     await new Promise(resolve => {
+//         localPeer.onicecandidate = (event) => {
+//             if (event.candidate === null) {
+//                 resolve();
+//             }
+//         };
+//     });
 
-    console.log("Local Description Value:", JSON.stringify(localPeer.localDescription));
-    document.querySelector("#localConfigText").value = JSON.stringify(localPeer.localDescription);
+//     console.log("Local Description Value:", JSON.stringify(localPeer.localDescription));
+//     document.querySelector("#localConfigText").value = JSON.stringify(localPeer.localDescription);
+// });
+
+      remoteConnectBtn.addEventListener("click", async function () {
+    try {
+        await localPeer.setRemoteDescription(JSON.parse(remoteConfigText.value));
+        const answer = await localPeer.createAnswer();
+        await localPeer.setLocalDescription(answer);
+
+        // Wait for ICE candidate to be available
+        await new Promise(resolve => {
+            localPeer.onicecandidate = (event) => {
+                if (event.candidate === null) {
+                    resolve();
+                }
+            };
+        });
+
+        console.log("Local Description Value:", JSON.stringify(localPeer.localDescription));
+        document.querySelector("#localConfigText").value = JSON.stringify(localPeer.localDescription);
+    } catch (error) {
+        console.error("Error setting remote description:", error);
+    }
 });
+
 
 
 
