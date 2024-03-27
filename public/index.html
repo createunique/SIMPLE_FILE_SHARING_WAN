@@ -296,7 +296,7 @@
       const urlParams = new URLSearchParams(window.location.search);
   const offerValue = urlParams.get('offer');
   if (offerValue) {
-    //console.log(offerValue);
+    console.log(offerValue);
     document.querySelector("#remoteConfigText").value = offerValue;
     document.getElementById("connectRemoteConfig").click();
     console.log("clicked connect");
