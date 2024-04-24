@@ -54,5 +54,5 @@ The system ensures secure and efficient file transfer by directly connecting pee
 
 ## Team
 
-- [Nishant Kumar] @me
-- [Viswanadha Sai Nissankararao](https://github.com/createunique)
+- [Nishant Kumar] ( https://github.com/nishant-kumarr )
+- [Viswanadha Sai Nissankararao] @ME
