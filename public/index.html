@@ -1,88 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="shortcut icon"
-      href="https://static-00.iconduck.com/assets.00/webrtc-icon-512x496-cef4xjw5.png"
-      type="image/x-icon"
-    />
+    <link rel="shortcut icon" href="https://static-00.iconduck.com/assets.00/webrtc-icon-512x496-cef4xjw5.png" type="image/x-icon" />
     <link rel="stylesheet" href="styles.css">
+    <title>P2P File Transfer | WebRTC</title>
+</head>
+<body>
+    <div class="container">
+        <h1>P2P File Transfer</h1>
+        <div id="connectionStatus">Not connected to peer</div>
 
-    <link
-      rel="icon"
-      href="https://static-00.iconduck.com/assets.00/webrtc-icon-512x496-cef4xjw5.png"
-      type="image/x-icon"
-    />
-    <title>Playground | WebRTC</title>
-  </head>
-  <body>
-    <style>
-      body {
-        padding: 20px;
-      }
-    </style>
+        <div class="instructions">
+            <ul>
+                <li>Open this page in 2 tabs</li>
+                <li>In the first tab, click on "Create Offer" and copy the generated text</li>
+                <li>In the second tab, paste the text in the Remote section</li>
+                <li>Click "Connect" in the second tab and copy the generated response</li>
+                <li>Paste the response in the first tab's Remote section and click "Connect"</li>
+                <li>Once connected, you can start sharing files</li>
+            </ul>
+        </div>
 
-    <h1>P2P File Tansfer (WebRTC)</h1>
-    <p id="connectionStatus">Not connected to peer.</p>
-    <ul style="font-size: 14px; line-height: 1.9; margin-top: 20px">
-      <li>Step 1: Open this page in 2 tabs</li>
-      <li>
-        Step 2: In the first tab, click on create offer and copy the text
-        generated in the text box under Local
-      </li>
-      <li>
-        Step 3: In the second tab, paste the text generated in the text box
-        under Remote
-      </li>
-      <li>
-        Step 4: Click on connect under Remote in the 2nd tab, now copy the text
-        generated in the Local text area.
-      </li>
-      <li>
-        Step 5: Paste this in the Remote text box in 1st tab and click on
-        connect.
-      </li>
-      <li>
-        Connected to peer should populate, and now share files.
-      </li>
-    </ul>
+        <div class="connection-container">
+            <div class="connection-box">
+                <h2>Local</h2>
+                <textarea id="localConfigText" rows="8" placeholder="Local configuration will appear here..."></textarea>
+                <button id="connectLocalConfig">Create Offer</button>
+            </div>
 
-    <div style="display: flex; align-items: center; width: 100%">
-      <div style="width: 50%; background-color: beige; padding: 20px">
-        <h2>Local</h2>
-        <textarea id="localConfigText" cols="50" rows="15"></textarea>
-        <button id="connectLocalConfig">Create local offer</button>
-      </div>
+            <div class="connection-box">
+                <h2>Remote</h2>
+                <textarea id="remoteConfigText" rows="8" placeholder="Paste remote configuration here..."></textarea>
+                <button id="connectRemoteConfig">Connect</button>
+            </div>
+        </div>
 
-      <div style="width: 50%; padding: 20px; background: beige">
-        <h2>Remote</h2>
-        <textarea id="remoteConfigText" cols="50" rows="15"></textarea>
-        <button id="connectRemoteConfig">Connect</button>
-      </div>
+        <div class="file-transfer-section">
+            <h2>File Transfer</h2>
+            <input type="file" id="file-upload" />
+            <button hidden id="sendFile">Send file</button>
+            <div class="progress-container">
+                <progress id="progress" value="0"></progress>
+                <label id="progressLabel"></label>
+            </div>
+            <a href="" id="downloadanchor"></a>
+            <button hidden id="createBlob">Create blob</button>
+        </div>
     </div>
-
-    <br />
-    <hr />
-    <br />
-
-    <div>
-      <input type="file" id="file-upload" />
-      <button hidden id="sendFile">Send file</button><br />
-      <progress id="progress" value="0"></progress>&nbsp;&nbsp;<label
-        id="progressLabel"
-      ></label>
-    </div>
-
-    <br />
-    <hr />
-    <br />
-
-    <small id="progress"></small>
-    <a href="" id="downloadanchor"></a>
-    <button hidden id="createBlob">Create blob</button>
 
     <script>
       var remoteConnectBtn = document.getElementById("connectRemoteConfig");
@@ -145,27 +112,6 @@
       });
 
 
-      
-//       remoteConnectBtn.addEventListener("click", async function () {
-//     localPeer.setRemoteDescription(JSON.parse(remoteConfigText.value));
-    
-//     // Create the answer
-//     const answer = await localPeer.createAnswer();
-//     await localPeer.setLocalDescription(answer);
-
-//     // Wait for ICE candidate to be available
-//     await new Promise(resolve => {
-//         localPeer.onicecandidate = (event) => {
-//             if (event.candidate === null) {
-//                 resolve();
-//             }
-//         };
-//     });
-
-//     console.log("Local Description Value:", JSON.stringify(localPeer.localDescription));
-//     document.querySelector("#localConfigText").value = JSON.stringify(localPeer.localDescription);
-// });
-
       remoteConnectBtn.addEventListener("click", async function () {
     try {
         await localPeer.setRemoteDescription(JSON.parse(remoteConfigText.value));
@@ -187,9 +133,6 @@
         console.error("Error setting remote description:", error);
     }
 });
-
-
-
 
       sendFileBtn.addEventListener("click", function () {});
 
@@ -302,5 +245,5 @@
     // connectRemoteConfig(); // Call the function directly
   }
     </script>
-  </body>
+</body>
 </html>
