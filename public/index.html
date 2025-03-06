@@ -79,60 +79,51 @@
 
       let receivedFile = {};
 
+      // Utility function to await ICE gathering complete
+      async function waitForIceGatheringComplete(pc) {
+        if (pc.iceGatheringState === 'complete') return;
+        return new Promise(resolve => {
+          pc.addEventListener('icegatheringstatechange', function check() {
+            if (pc.iceGatheringState === 'complete') {
+              pc.removeEventListener('icegatheringstatechange', check);
+              resolve();
+            }
+          });
+        });
+      }
+
       localConnectBtn.addEventListener("click", async function () {
         dataChannel = localPeer.createDataChannel("dataChannel");
         dataChannel.binaryType = "arraybuffer";
         dataChannel.onmessage = (msg) => onReceiveMessageCallback(msg);
         dataChannel.bufferedAmountLowThreshold = 0;
-        dataChannel.onopen = () =>
-          (document.getElementById("connectionStatus").innerHTML =
-            "Connected to peer.");
-          
-            localPeer.onicecandidate = (event) => {
-        if (event.candidate === null) 
-        {
-          // ICE gathering completed
-      const localDescriptionText = JSON.stringify(localPeer.localDescription);
-      const modifiedText = "https://simple-file-sharing-wan.vercel.app/?offer=" + localDescriptionText; // Modified text
-      document.querySelector("#localConfigText").value = localDescriptionText;
-
-      // Copy modified local description text to clipboard
-      navigator.clipboard.writeText(modifiedText)
-        .then(() => console.log('Modified local description copied to clipboard'))
-        .catch(err => console.error('Failed to copy modified local description to clipboard: ', err));
-        }
-      };
-
-
+        dataChannel.onopen = async () => {
+          document.getElementById("connectionStatus").innerHTML = "Connected to peer.";
+        };
 
         const localOffer = await localPeer.createOffer();
-        localPeer.setLocalDescription(new RTCSessionDescription(localOffer));
-
-        
+        await localPeer.setLocalDescription(localOffer);
+        await waitForIceGatheringComplete(localPeer);
+        const localDescriptionText = JSON.stringify(localPeer.localDescription);
+        const modifiedText = "https://simple-file-sharing-wan.vercel.app/?offer=" + encodeURIComponent(localDescriptionText);
+        document.querySelector("#localConfigText").value = localDescriptionText;
+        navigator.clipboard.writeText(modifiedText)
+          .then(() => console.log('Modified local description copied to clipboard'))
+          .catch(err => console.error('Failed to copy modified local description to clipboard: ', err));
       });
 
-
       remoteConnectBtn.addEventListener("click", async function () {
-    try {
-        await localPeer.setRemoteDescription(JSON.parse(remoteConfigText.value));
-        const answer = await localPeer.createAnswer();
-        await localPeer.setLocalDescription(answer);
-
-        // Wait for ICE candidate to be available
-        await new Promise(resolve => {
-            localPeer.onicecandidate = (event) => {
-                if (event.candidate === null) {
-                    resolve();
-                }
-            };
-        });
-
-        console.log("Local Description Value:", JSON.stringify(localPeer.localDescription));
-        document.querySelector("#localConfigText").value = JSON.stringify(localPeer.localDescription);
-    } catch (error) {
-        console.error("Error setting remote description:", error);
-    }
-});
+        try {
+          await localPeer.setRemoteDescription(JSON.parse(remoteConfigText.value));
+          const answer = await localPeer.createAnswer();
+          await localPeer.setLocalDescription(answer);
+          await waitForIceGatheringComplete(localPeer);
+          const localDescriptionText = JSON.stringify(localPeer.localDescription);
+          document.querySelector("#localConfigText").value = localDescriptionText;
+        } catch (error) {
+          console.error("Error setting remote description:", error);
+        }
+      });
 
       sendFileBtn.addEventListener("click", function () {});
 
