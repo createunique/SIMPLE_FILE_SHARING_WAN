@@ -73,6 +73,31 @@
         ],
       });
 
+      // Add connection state handling
+      localPeer.onconnectionstatechange = (event) => {
+        console.log("Connection state:", localPeer.connectionState);
+      };
+
+      // Reset peer connection function
+      function resetPeerConnection() {
+        if (dataChannel) {
+          dataChannel.close();
+        }
+        if (localPeer) {
+          localPeer.close();
+        }
+        localPeer = new RTCPeerConnection({
+          iceServers: [
+            { urls: "stun:freestun.net:3479" },
+            {
+              urls: "turn:freestun.net:3479",
+              username: "free",
+              credential: "free",
+            },
+          ],
+        });
+      }
+
       let dataChannel;
       let receiveBuffer = [];
       let receivedSize = 0;
@@ -93,35 +118,52 @@
       }
 
       localConnectBtn.addEventListener("click", async function () {
-        dataChannel = localPeer.createDataChannel("dataChannel");
-        dataChannel.binaryType = "arraybuffer";
-        dataChannel.onmessage = (msg) => onReceiveMessageCallback(msg);
-        dataChannel.bufferedAmountLowThreshold = 0;
-        dataChannel.onopen = async () => {
-          document.getElementById("connectionStatus").innerHTML = "Connected to peer.";
-        };
+        try {
+          resetPeerConnection(); // Reset before creating new offer
+          
+          dataChannel = localPeer.createDataChannel("dataChannel");
+          dataChannel.binaryType = "arraybuffer";
+          dataChannel.onmessage = (msg) => onReceiveMessageCallback(msg);
+          dataChannel.bufferedAmountLowThreshold = 0;
+          dataChannel.onopen = async () => {
+            document.getElementById("connectionStatus").innerHTML = "Connected to peer.";
+          };
 
-        const localOffer = await localPeer.createOffer();
-        await localPeer.setLocalDescription(localOffer);
-        await waitForIceGatheringComplete(localPeer);
-        const localDescriptionText = JSON.stringify(localPeer.localDescription);
-        const modifiedText = "https://simple-file-sharing-wan.vercel.app/?offer=" + encodeURIComponent(localDescriptionText);
-        document.querySelector("#localConfigText").value = localDescriptionText;
-        navigator.clipboard.writeText(modifiedText)
-          .then(() => console.log('Modified local description copied to clipboard'))
-          .catch(err => console.error('Failed to copy modified local description to clipboard: ', err));
+          const localOffer = await localPeer.createOffer();
+          await localPeer.setLocalDescription(localOffer);
+          await waitForIceGatheringComplete(localPeer);
+          const localDescriptionText = JSON.stringify(localPeer.localDescription);
+          const modifiedText = "https://simple-file-sharing-wan.vercel.app/?offer=" + encodeURIComponent(localDescriptionText);
+          document.querySelector("#localConfigText").value = localDescriptionText;
+          navigator.clipboard.writeText(modifiedText)
+            .then(() => console.log('Modified local description copied to clipboard'))
+            .catch(err => console.error('Failed to copy modified local description to clipboard: ', err));
+        } catch (error) {
+          console.error("Error in local connection:", error);
+          resetPeerConnection();
+          document.getElementById("connectionStatus").innerHTML = "Connection failed. Please try again.";
+        }
       });
 
       remoteConnectBtn.addEventListener("click", async function () {
         try {
-          await localPeer.setRemoteDescription(JSON.parse(remoteConfigText.value));
-          const answer = await localPeer.createAnswer();
-          await localPeer.setLocalDescription(answer);
-          await waitForIceGatheringComplete(localPeer);
-          const localDescriptionText = JSON.stringify(localPeer.localDescription);
-          document.querySelector("#localConfigText").value = localDescriptionText;
+          const remoteDesc = JSON.parse(remoteConfigText.value);
+          
+          if (remoteDesc.type === 'offer') {
+            await localPeer.setRemoteDescription(remoteDesc);
+            const answer = await localPeer.createAnswer();
+            await localPeer.setLocalDescription(answer);
+            await waitForIceGatheringComplete(localPeer);
+            document.querySelector("#localConfigText").value = JSON.stringify(localPeer.localDescription);
+          } else if (remoteDesc.type === 'answer') {
+            await localPeer.setRemoteDescription(remoteDesc);
+          }
+          
         } catch (error) {
-          console.error("Error setting remote description:", error);
+          console.error("Error in remote connection:", error);
+          // Reset connection on error
+          resetPeerConnection();
+          document.getElementById("connectionStatus").innerHTML = "Connection failed. Please try again.";
         }
       });
 
